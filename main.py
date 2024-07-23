@@ -18,7 +18,7 @@ store = Store(new_list)
 
 pixel = Product("Google Pixel 7", 250, 500)
 store.add_product(pixel)
-store.show_list_products()  # Korrigierte Methode aufrufen
+store.show_list_products()  # method calling
 
 print(f"Total quantity in store: {store.get_total_quantity()}")
 
@@ -29,4 +29,16 @@ store = Store([bose, mac])
 price = store.order([(bose, 5), (mac, 30), (bose, 10)])
 print(f"Order cost: {price} dollars.")
 
-store.show_list_products()  # Korrigierte Methode aufrufen
+store.show_list_products()  # correct methode calling
+
+
+product_list = [
+    Product("MacBook Air M2", price=1450, quantity=100),
+    Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+    Product("Google Pixel 7", price=500, quantity=250),
+]
+
+store = Store(product_list)
+products = store.get_all_products()
+print(store.get_total_quantity())
+print(store.order([(products[0], 1), (products[1], 2)]))
