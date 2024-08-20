@@ -1,7 +1,16 @@
-from products import Product, Store
+# main.py
+
+from products import Product
+from store import Store
 
 
 def start(store):
+    """
+    Display the store menu and process user input to perform actions such as
+    listing products, showing total amount, making an order, or quitting the program.
+
+    :param store: Store object containing the list of products.
+    """
     while True:
         print("\nStore Menu\n----------")
         print("1. List all products in store")
@@ -13,7 +22,8 @@ def start(store):
         if choice == "1":
             store.show_list_products()
         elif choice == "2":
-            print(f"Total quantity in store: {store.get_total_quantity()}")
+            total_quantity = store.get_total_quantity()
+            print(f"Total quantity in store: {total_quantity}")
         elif choice == "3":
             make_order(store)
         elif choice == "4":
@@ -24,6 +34,12 @@ def start(store):
 
 
 def make_order(store):
+    """
+    Facilitate the ordering process by allowing users to select products and specify quantities.
+    Validate inputs and notify the user if the requested quantity exceeds available stock.
+
+    :param store: Store object containing the list of products.
+    """
     shopping_list = []
     while True:
         print("\n------")
@@ -34,7 +50,7 @@ def make_order(store):
         print("------")
         product_number = input("Which product # do you want? (or 'done' to finish): ")
 
-        if product_number == "done" or product_number == "":
+        if product_number.lower() == "done" or product_number == "":
             break
 
         try:
@@ -45,7 +61,14 @@ def make_order(store):
                         f"Enter the quantity for {store.list_products[product_index].name}: "
                     )
                 )
-                shopping_list.append((store.list_products[product_index], quantity))
+
+                # Check if the requested quantity is available
+                if quantity > store.list_products[product_index].get_quantity():
+                    print(
+                        f"Requested quantity exceeds available stock for {store.list_products[product_index].name}."
+                    )
+                else:
+                    shopping_list.append((store.list_products[product_index], quantity))
             else:
                 print("Invalid product number. Please try again.")
         except ValueError:
@@ -55,14 +78,19 @@ def make_order(store):
     print(f"Order cost: {total_price} dollars.")
 
 
-# setup initial stock of inventory
-product_list = [
-    Product("MacBook Air M2", price=1450, quantity=100),
-    Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-    Product("Google Pixel 7", price=500, quantity=250),
-]
+def main():
+    """
+    Main function to setup initial stock of inventory and start the store program.
+    """
+    product_list = [
+        Product("MacBook Air M2", price=1450, quantity=100),
+        Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+        Product("Google Pixel 7", price=500, quantity=250),
+    ]
 
-best_buy = Store(product_list)
+    best_buy = Store(product_list)
+    start(best_buy)
 
 
-start(best_buy)
+if __name__ == "__main__":
+    main()

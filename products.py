@@ -1,7 +1,15 @@
 class Product:
+    """
+    Represents a product in the store.
+
+    :param name: Name of the product.
+    :param quantity: Quantity of the product in stock.
+    :param price: Price of the product.
+    """
+
     def __init__(self, name, quantity, price):
         if not name:
-            raise ValueError("Product cannot be empty")
+            raise ValueError("Product name cannot be empty")
         if price < 0 or quantity < 0:
             raise ValueError("Price and quantity must be non-negative")
 
@@ -10,75 +18,60 @@ class Product:
         self.price = price
         self.active = True
 
-    def get_quantity(self) -> float:
+    def get_quantity(self) -> int:
+        """
+        Returns the current quantity of the product.
+
+        :return: Quantity of the product.
+        """
         return self.quantity
 
     def set_quantity(self, quantity):
-        self.quantity = quantity  # setting the new amount
+        """
+        Sets the quantity of the product and deactivates it if the quantity is zero.
 
+        :param quantity: New quantity of the product.
+        """
+        if quantity < 0:
+            raise ValueError("Quantity must be non-negative")
+
+        self.quantity = quantity
         if self.quantity == 0:
-            self.active = False  # deactivate the product if 0 amount
+            self.deactivate()
 
     def is_active(self) -> bool:
+        """
+        Checks if the product is active (i.e., has quantity greater than zero).
+
+        :return: True if the product is active, otherwise False.
+        """
         return self.active
 
-    def activate(self):
-        self.active = True
-
     def deactivate(self):
+        """
+        Deactivates the product, marking it as inactive.
+        """
         self.active = False
 
-    def show(self):
-        print(f"{self.name}, Price: {self.price}, Quantity: {self.quantity}")
+    def __str__(self):
+        """
+        Returns a string representation of the product.
+        """
+        return f"{self.name}, Price: ${self.price}, Quantity: {self.quantity}"
 
     def buy(self, quantity) -> float:
+        """
+        Processes the purchase of the product by reducing its quantity and 
+        calculating the total price.
+
+        :param quantity: The quantity of the product to buy.
+        :return: The total price for the purchased quantity.
+        :raises ValueError: If the requested quantity is greater than the available quantity.
+        """
         if quantity > self.quantity:
-            raise ValueError("Your requested quantity is too high")
+            raise ValueError("Requested quantity exceeds available stock")
+        
         total_price = quantity * self.price
-        self.quantity -= quantity
-        if self.quantity == 0:
-            self.active = False
+        self.set_quantity(self.quantity - quantity)
+        
         return total_price
-
-
-class MacBookAirM2(Product):
-    def __init__(self):
-        super().__init__("MacBook Air M2", 100, 1450.00)
-
-
-class BoseQuietComfortEarbuds(Product):
-    def __init__(self):
-        super().__init__("Bose QuietComfort Earbuds", 500, 250.00)
-
-
-class Store:
-    def __init__(self, products=None):
-        if products is None:
-            self.list_products = []
-        else:
-            self.list_products = products
-
-    def add_product(self, product):
-        self.list_products.append(product)
-
-    def remove_product(self, product):
-        if product in self.list_products:
-            self.list_products.remove(product)
-
-    def get_total_quantity(self) -> int:
-        total_quantity = sum(product.get_quantity() for product in self.list_products)
-        return total_quantity
-
-    def get_all_products(self) -> list:
-        return [product for product in self.list_products if product.is_active()]
-
-    def order(self, shopping_list) -> float:
-        total_price = 0.0
-        for product, quantity in shopping_list:
-            if product in self.list_products and quantity <= product.get_quantity():
-                total_price += product.buy(quantity)
-        return total_price
-
-    def show_list_products(self):
-        for product in self.list_products:
-            product.show()
