@@ -1,12 +1,6 @@
 class Product:
     """
     Represents a product in the store.
-
-    Attributes:
-        name (str): The name of the product.
-        price (float): The price of the product.
-        quantity (int): The quantity of the product in stock.
-        active (bool): Indicates if the product is active (in stock).
     """
 
     def __init__(self, name, price, quantity):
@@ -20,7 +14,8 @@ class Product:
         self.name = name
         self.price = price
         self.quantity = quantity
-        self.active = True if quantity > 0 else False
+        self.active = quantity > 0
+        self.promotion = None  # Initialize with no promotion
 
     def get_quantity(self):
         """
@@ -31,12 +26,6 @@ class Product:
     def set_quantity(self, quantity):
         """
         Sets the quantity of the product in stock.
-
-        Args:
-            quantity (int): The new quantity of the product.
-
-        Raises:
-            ValueError: If the quantity is negative.
         """
         if quantity < 0:
             raise ValueError("Quantity must be non-negative")
@@ -46,38 +35,46 @@ class Product:
     def is_active(self):
         """
         Checks if the product is active (in stock).
-
-        Returns:
-            bool: True if the product is active, False otherwise.
         """
         return self.active
 
+    def set_promotion(self, promotion):
+        """
+        Sets a promotion for the product.
+        """
+        self.promotion = promotion
+
+    def get_promotion(self):
+        """
+        Returns the current promotion of the product.
+        """
+        return self.promotion
+
     def buy(self, quantity):
         """
-        Processes the purchase of the product.
-
-        Args:
-            quantity (int): The quantity to purchase.
-
-        Returns:
-            float: The total price of the purchase.
-
-        Raises:
-            ValueError: If the requested quantity exceeds the available quantity.
+        Processes the purchase of the product with promotion if applicable.
         """
         if quantity > self.quantity:
-            raise ValueError("Requested quantity is too high")
-        total_price = quantity * self.price
+            raise ValueError("Requested quantity exceeds available stock")
+        
+        if self.promotion:
+            total_price = self.promotion.apply_promotion(self, quantity)
+        else:
+            total_price = quantity * self.price
+        
         self.quantity -= quantity
         if self.quantity == 0:
             self.active = False
+        
         return total_price
 
     def show(self):
         """
         Returns a string representation of the product details.
         """
-        return f"{self.name}, Price: ${self.price}, Quantity: {self.quantity}"
+        promotion_info = f" Promotion: {self.promotion.name}" if self.promotion else ""
+        return f"{self.name}, Price: ${self.price}, Quantity: {self.quantity}{promotion_info}"
+
 
 
 class NonStockedProduct(Product):

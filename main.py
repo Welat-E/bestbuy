@@ -1,6 +1,6 @@
 from products import Product, LimitedProduct, NonStockedProduct
 from store import Store
-
+from promotions import SecondHalfPrice, ThirdOneFree, PercentDiscount
 
 def start(store):
     """
@@ -25,11 +25,10 @@ def start(store):
         elif choice == "3":
             make_order(store)
         elif choice == "4":
-            print("Thank you for your purchase, see you again :) .")
+            print("Quitting...")
             break
         else:
             print("Invalid choice. Please try again.")
-
 
 def make_order(store):
     """
@@ -75,7 +74,6 @@ def make_order(store):
     total_price = store.order(shopping_list)
     print(f"Order cost: {total_price} dollars.")
 
-
 def main():
     """
     Main function to setup initial stock of inventory and start the store program.
@@ -85,12 +83,21 @@ def main():
         Product("Bose QuietComfort Earbuds", price=250, quantity=500),
         Product("Google Pixel 7", price=500, quantity=250),
         NonStockedProduct("Windows License", price=125),
-        LimitedProduct("Shipping", price=10, quantity=250, maximum=1),
+        LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
     ]
+
+    # Create promotion catalog
+    second_half_price = SecondHalfPrice("Second Half price!")
+    third_one_free = ThirdOneFree("Third One Free!")
+    thirty_percent = PercentDiscount("30% off!", percent=30)
+
+    # Add promotions to products
+    product_list[0].set_promotion(second_half_price)
+    product_list[1].set_promotion(third_one_free)
+    product_list[3].set_promotion(thirty_percent)
 
     best_buy = Store(product_list)
     start(best_buy)
-
 
 if __name__ == "__main__":
     main()
