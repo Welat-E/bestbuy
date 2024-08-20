@@ -1,6 +1,4 @@
-# main.py
-
-from products import Product
+from products import Product, LimitedProduct, NonStockedProduct
 from store import Store
 
 
@@ -27,7 +25,7 @@ def start(store):
         elif choice == "3":
             make_order(store)
         elif choice == "4":
-            print("Quitting...")
+            print("Thank you for your purchase, see you again :) .")
             break
         else:
             print("Invalid choice. Please try again.")
@@ -86,6 +84,8 @@ def main():
         Product("MacBook Air M2", price=1450, quantity=100),
         Product("Bose QuietComfort Earbuds", price=250, quantity=500),
         Product("Google Pixel 7", price=500, quantity=250),
+        NonStockedProduct("Windows License", price=125),
+        LimitedProduct("Shipping", price=10, quantity=250, maximum=1),
     ]
 
     best_buy = Store(product_list)

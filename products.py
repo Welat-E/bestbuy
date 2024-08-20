@@ -2,76 +2,164 @@ class Product:
     """
     Represents a product in the store.
 
-    :param name: Name of the product.
-    :param quantity: Quantity of the product in stock.
-    :param price: Price of the product.
+    Attributes:
+        name (str): The name of the product.
+        price (float): The price of the product.
+        quantity (int): The quantity of the product in stock.
+        active (bool): Indicates if the product is active (in stock).
     """
 
-    def __init__(self, name, quantity, price):
+    def __init__(self, name, price, quantity):
+        """
+        Initializes a new Product instance.
+        """
         if not name:
             raise ValueError("Product name cannot be empty")
         if price < 0 or quantity < 0:
             raise ValueError("Price and quantity must be non-negative")
-
         self.name = name
-        self.quantity = quantity
         self.price = price
-        self.active = True
+        self.quantity = quantity
+        self.active = True if quantity > 0 else False
 
-    def get_quantity(self) -> int:
+    def get_quantity(self):
         """
-        Returns the current quantity of the product.
-
-        :return: Quantity of the product.
+        Returns the quantity of the product in stock.
         """
         return self.quantity
 
     def set_quantity(self, quantity):
         """
-        Sets the quantity of the product and deactivates it if the quantity is zero.
+        Sets the quantity of the product in stock.
 
-        :param quantity: New quantity of the product.
+        Args:
+            quantity (int): The new quantity of the product.
+
+        Raises:
+            ValueError: If the quantity is negative.
         """
         if quantity < 0:
             raise ValueError("Quantity must be non-negative")
-
         self.quantity = quantity
-        if self.quantity == 0:
-            self.deactivate()
+        self.active = self.quantity > 0
 
-    def is_active(self) -> bool:
+    def is_active(self):
         """
-        Checks if the product is active (i.e., has quantity greater than zero).
+        Checks if the product is active (in stock).
 
-        :return: True if the product is active, otherwise False.
+        Returns:
+            bool: True if the product is active, False otherwise.
         """
         return self.active
 
-    def deactivate(self):
+    def buy(self, quantity):
         """
-        Deactivates the product, marking it as inactive.
-        """
-        self.active = False
+        Processes the purchase of the product.
 
-    def __str__(self):
+        Args:
+            quantity (int): The quantity to purchase.
+
+        Returns:
+            float: The total price of the purchase.
+
+        Raises:
+            ValueError: If the requested quantity exceeds the available quantity.
         """
-        Returns a string representation of the product.
+        if quantity > self.quantity:
+            raise ValueError("Requested quantity is too high")
+        total_price = quantity * self.price
+        self.quantity -= quantity
+        if self.quantity == 0:
+            self.active = False
+        return total_price
+
+    def show(self):
+        """
+        Returns a string representation of the product details.
         """
         return f"{self.name}, Price: ${self.price}, Quantity: {self.quantity}"
 
-    def buy(self, quantity) -> float:
-        """
-        Processes the purchase of the product by reducing its quantity and 
-        calculating the total price.
 
-        :param quantity: The quantity of the product to buy.
-        :return: The total price for the purchased quantity.
-        :raises ValueError: If the requested quantity is greater than the available quantity.
+class NonStockedProduct(Product):
+    """
+    Represents a non-stocked product (e.g., software licenses) in the store.
+    """
+
+    def __init__(self, name, price):
         """
-        if quantity > self.quantity:
-            raise ValueError("Requested quantity exceeds available stock")
-        
-        total_price = quantity * self.price
-        self.set_quantity(self.quantity - quantity)
-        
-        return total_price
+        Initializes a new NonStockedProduct instance.
+
+        Args:
+            name (str): The name of the non-stocked product.
+            price (float): The price of the non-stocked product.
+        """
+        super().__init__(name, price, quantity=0)
+
+    def set_quantity(self, quantity):
+        """
+        Prevents changing the quantity of a non-stocked product.
+        """
+        pass  # Non-stocked products do not track quantity
+
+    def buy(self, quantity):
+        """
+        Processes the purchase of a non-stocked product.
+
+        Args:
+            quantity (int): The quantity to purchase.
+
+        Returns:
+            float: The total price of the purchase.
+        """
+        return quantity * self.price
+
+    def show(self):
+        """
+        Returns a string representation of the non-stocked product details.
+        """
+        return f"{self.name} (Non-Stocked), Price: ${self.price}"
+
+
+class LimitedProduct(Product):
+    """
+    Represents a product with a purchase limit in the store.
+    """
+
+    def __init__(self, name, price, quantity, maximum):
+        """
+        Initializes a new LimitedProduct instance.
+
+        Args:
+            name (str): The name of the product.
+            price (float): The price of the product.
+            quantity (int): The quantity of the product in stock.
+            maximum (int): The maximum quantity that can be purchased
+            in a single order.
+        """
+        super().__init__(name, price, quantity)
+        self.maximum = maximum
+
+    def buy(self, quantity):
+        """
+        Processes the purchase of the product with a quantity limit.
+
+        Args:
+            quantity (int): The quantity to purchase.
+
+        Returns:
+            float: The total price of the purchase.
+
+        Raises:
+            ValueError: If the requested quantity exceeds the maximum limit.
+        """
+        if quantity > self.maximum:
+            raise ValueError(
+                f"Cannot purchase more than {self.maximum} of {self.name} in a single order"
+            )
+        return super().buy(quantity)
+
+    def show(self):
+        """
+        Returns a string representation of the limited product details.
+        """
+        return f"{self.name}, Price: ${self.price}, Quantity: {self.quantity}, Max per order: {self.maximum}"
