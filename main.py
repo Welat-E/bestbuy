@@ -26,10 +26,25 @@ def start(store):
         elif choice == "3":
             make_order(store)
         elif choice == "4":
-            print("Quitting...")
+            print("Thank you for your purchase. Goodbye!")
             break
         else:
             print("Invalid choice. Please try again.")
+
+
+def ask_to_continue():
+    """
+    Repeatedly asks the user whether they want to continue shopping until a valid response is given.
+    :return: True if the user wants to continue, False otherwise.
+    """
+    while True:
+        question = input("Do you want to continue your purchase (Y/N)? ").upper()
+        if question == "Y":
+            return True
+        elif question == "N":
+            return False
+        else:
+            print("Invalid input. Please enter Y or N.")
 
 
 def make_order(store):
@@ -40,6 +55,7 @@ def make_order(store):
     :param store: Store object containing the list of products.
     """
     shopping_list = []
+
     while True:
         print("\n------")
         for i, product in enumerate(store.list_products, start=1):
@@ -47,7 +63,7 @@ def make_order(store):
                 f"{i}. {product.name}, Price: ${product.price}, Quantity: {product.quantity}"
             )
         print("------")
-        product_number = input("Which product # do you want? (or 'done' to finish): ")
+        product_number = input("Which product do you want? (or 'done' to finish): ")
 
         if product_number.lower() == "done" or product_number == "":
             break
@@ -72,6 +88,10 @@ def make_order(store):
                 print("Invalid product number. Please try again.")
         except ValueError:
             print("Invalid input. Please enter a number.")
+
+        # Call the function to ask whether the user wants to continue
+        if not ask_to_continue():
+            break
 
     total_price = store.order(shopping_list)
     print(f"Order cost: {total_price} dollars.")
